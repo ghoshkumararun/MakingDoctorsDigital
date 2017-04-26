@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Login | Making Doctors Digital</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css" />
+
+    <link href="/css/font-awesome.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600" rel="stylesheet">
+
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/css/pages/signin.css" rel="stylesheet" type="text/css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+
+    <script>
+
+        var app = angular.module("mDD_signIn_app", []);
+        app.controller("mDD_signIn_controller", function($scope,$http,$window) {
+
+            $http({
+                method:'get',
+                url:'/session'
+            }).then(function(res){
+                console.log("inside session");
+                if(res.data.status == "200"){
+                    if(res.data.signInAs == "admin"){
+                        $window.location.href = '/adminHome';
+                    }
+                    else if(res.data.signInAs == "patient"){
+                        $window.location.href = '/patientHome';
+                    }
+                    else if(res.data.signInAs == "doctor"){
+                        $window.location.href = '/doctorHome';
+                    }
+
+                }else{
+                }
+            });
+
+            $scope.signUp = function(){
+                $window.location.href = '/signUp';
+            }
+
+            $scope.index = function(){
+                $window.location.href = '/index';
+            }
+
+            $scope.SignIn = function(){
+
+                console.log("inside sign in function");
+                var url = "/userSignIn";
+
+                console.log($scope.signIn.type+" 	"+$scope.signIn.email+" 	"+$scope.signIn.password);
+
+                if($scope.signIn.type == "admin"){
+                    url+="Admin";
+                }else if($scope.signIn.type == "patient"){
+                    url+="Patient";
+                }else if($scope.signIn.type == "doctor"){
+                    url+="Doctor";
+                }
+
+                $http({
+                    method:'post',
+                    url: url,
+                    data:{ username: $scope.signIn.email , password: $scope.signIn.password },
+                    dataType: 'html'
+                }).then(function(res){
+                    if(res.data.status == "200"){
+                        if(res.data.signInAs == "patient"){
+                            $window.location.href = '/patientHome';
+                        }else if(res.data.signInAs == "admin"){
+                            $window.location.href = '/adminHome';
+                        }else if(res.data.signInAs == "doctor"){
+                            $window.location.href = '/doctorHome';
+                        }
+                    }else{
+                        $scope.serverError = res.data.msg;
+                    }
+                });
+            }
+        });
+
+    </script>
+
+
+</head>
+
+<body ng-app="mDD_signIn_app" ng-controller="mDD_signIn_controller">
+
+<div class="navbar navbar-fixed-top">
+
+    <div class="navbar-inner">
+
+        <div class="container">
+
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+
+            <a class="brand" href="/">
+               Making Doctors Digital
+            </a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+
+                    <li class="">
+                        <a>
+                            Don't have an account?
+                        </a>
+                    </li>
+
+                    <li class="">
+                        <a href="/signup" class="">
+                            <i class="icon-chevron-left"></i>
+                            Signup
+                        </a>
+
+                    </li>
+                </ul>
+
+            </div><!--/.nav-collapse -->
+
+        </div> <!-- /container -->
+
+    </div> <!-- /navbar-inner -->
+
+</div> <!-- /navbar -->
+
+
+
+<div class="account-container">
+
+    <div class="content clearfix">
+
+        <form name="signInForm">
+
+            <h1>Member Login</h1>
+
+            <div class="login-fields">
+
+                <p>Please provide your details</p>
+
+                <div id="ap_signin1a_password_row" class="ap_row">
+                    <select name="" id="" ng-model="signIn.type" class="form-control" style="background-color:#00ba8b; color: #fff;;" ng-change="" required>
+                        <option value="">Please select</option>
+                        <option value="patient">Sign In as Patient</option>
+                        <option value="doctor">Sign In as Doctor</option>
+                        <option value="admin">Sign In as Admin</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" value="" class="login username-field" ng-model="signIn.email"
+                           autofocus aria-required="true" placeholder="Email *"
+                           maxlength=30 ng-pattern="/[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}/" required autocomplete="off"/>
+                    <span>
+							<span style="color:#e51837;" ng-show="signInForm.email.$error.pattern">Please enter valid email</span>
+    						<span style="color:#e51837;" ng-show="signInForm.email.$error.required && signInForm.email.$dirty">Email is required</span>
+                    </span>
+
+                </div> <!-- /field -->
+
+                <div class="field">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" value="" class="login password-field" ng-model="signIn.password" autocomplete="on"
+                           autofocus aria-required="true" placeholder="Password *"
+                           maxlength=30 ng-pattern="/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*([-+_!@#$%^&*.,?])).{5,7}/" required autocomplete="off"/>
+                    <span>
+							<span style="color:#e51837;" ng-show="signInForm.password.$error.pattern">Password must contain a Number, Capital Letter, Small Letter and Special Character</span>
+    						<span style="color:#e51837;" ng-show="signInForm.password.$error.required && signInForm.password.$dirty">Password is required</span>
+                    </span>
+
+                </div> <!-- /password -->
+
+            </div> <!-- /login-fields -->
+
+            <div class="login-actions">
+
+				<span class="login-checkbox">
+					<input id="Field" name="Field" type="checkbox" class="field login-checkbox" value="First Choice" tabindex="4" />
+					<label class="choice" for="Field">Keep me signed in</label>
+				</span>
+
+                <button class="button btn btn-success btn-large" value="Sign In" ng-click="SignIn()" ng-disabled="signInForm.$invalid">Sign In</button>
+
+            </div> <!-- .actions -->
+
+
+
+        </form>
+
+    </div> <!-- /content -->
+
+</div> <!-- /account-container -->
+
+
+
+<div class="login-extra">
+    <a href="#">Reset Password</a>
+</div> <!-- /login-extra -->
+
+
+<script src="/javascripts/jquery-1.7.2.min.js"></script>
+<script src="javascripts/bootstrap.js"></script>
+
+<script src="/javascripts/signin.js"></script>
+
+</body>
+
+</html>
