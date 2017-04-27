@@ -10,8 +10,7 @@ const logDir = 'logs';
 var logger;
 
 
-exports.initializeBidLogger = function () {
-    console.log("inside initialize");
+exports.initializeDLogger = function () {
     if (!fs.existsSync(logDir)) {
         fs.mkdirSync(logDir);
     }else{
@@ -23,18 +22,17 @@ exports.initializeBidLogger = function () {
     logger = new (winston.Logger)({
         transports: [
             new(winston.transports.File)({
-                filename : '../logs/doctorLogs.log',
+                filename : 'logs/doctorLogs.log',
                 timestamp: tsFormat,
                 level: env === 'development' ? 'debug' : 'info'
             })
         ]
     });
-
 }
 
 
 
-exports.insertBidLog = function (msg) {
+exports.insertDLog = function (msg) {
 
     logger.info(msg);
 }

@@ -4,17 +4,42 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var passport = require('passport');
+var flash = require('connect-flash');
 var index = require('./routes/index');
 var users = require('./routes/users');
 var patient = require('./routes/patient');
 var doctor = require('./routes/doctor');
-
 var session = require("express-session");
 var MySQLStore = require('express-mysql-session')(session);
+require('./routes/passport')(passport);
 
 var app = express();
+var doctorLogs = require('./routes/doctorLogs');
+var patientLogs = require('./routes/patientLogs');
 
+//Logger
+doctorLogs.initializeDLogger();
+patientLogs.initializePLogger();
+
+//Passport for login
+app.use(passport.initialize());
+app.use(passport.session());
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(flash());
+
+//MySQL session store
 var options = {
     host: 'localhost',// Host name for database connection.
     port: 3306,// Port number for database connection.
@@ -36,7 +61,6 @@ var options = {
 };
 
 var sessionStore = new MySQLStore(options);
-
 app.use(session({
     key: 'session_cookie_name',
     secret: 'mDDKeyPhrase',
@@ -45,39 +69,81 @@ app.use(session({
     saveUninitialized: true
 }));
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-
-// session
-
+// Session
 app.get('/session', index.session);
 app.get('/sessionEnd', index.sessionEnd);
+
 
 // Users
 app.get('/', index.index);
 // app.use('/users', users);
 
+
 //Signup and Signin
 app.get('/signup',index.signup);
 app.get('/signin', index.signin);
 
+
 //Doctor
 app.post('/doctorSignUp',users.doctorSignUp);
-app.post('/userSignInDoctor', users.userSignInDoctor );
+app.post('/userSignInDoctor', function(req, res, next) {
+    passport.authenticate('login', function(err, user, info) {
+
+        console.log(user);
+
+        if(err) {
+            return next(err);
+        }
+        if(!user) {
+            return res.send("invalid");
+        }
+        req.logIn(user, {session:false}, function(err) {
+            console.log(user);
+            if(err) {
+                return next(err);
+            }
+            req.session.userName = user.results[0].email;
+            req.session.dId = user.results[0].doctor_id;
+            setTimeout(function () {
+                doctorLogs.insertDLog("userID: " + req.session.dId + " logged in");
+            }, 0);
+            console.log("session initilized")
+            return res.send({"statusCode":"200","signInAs":"doctor","msg":"valid user logging in"});
+        })
+    })(req, res, next)
+});
+
+app.get('/doctorHome', doctor.doctorHome);
+
+
+
 
 //Patient
 app.post('/patientSignUp',users.patientSignUp);
-app.post('/userSignInPatient', users.userSignInPatient );
+app.post('/userSignInPatient', function(req, res, next) {results
+    passport.authenticate('login', function(err, user, info) {
+
+        if(err) {
+            return next(err);
+        }
+        if(!user) {
+            return res.send("invalid");
+        }
+        req.logIn(user, {session:false}, function(err) {
+            if(err) {
+                return next(err);
+            }
+            req.session.email = user.results[0].email;
+            req.session.uid = user.results[0].patient_id;
+            setTimeout(function () {
+                patientLogs.insertPLog("userID: " + req.session.uid + " logged in");
+            }, 0);
+            console.log("session initilized")
+            return res.send("valid");
+        })
+    })(req, res, next)
+});
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -85,6 +151,8 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
+
+
 
 // error handler
 app.use(function(err, req, res, next) {

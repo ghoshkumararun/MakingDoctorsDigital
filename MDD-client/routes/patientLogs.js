@@ -10,7 +10,7 @@ const logDir = 'logs';
 var logger;
 
 
-exports.initializeLogger = function () {
+exports.initializePLogger = function () {
     console.log("inside initialize");
     if (!fs.existsSync(logDir)) {
         fs.mkdirSync(logDir);

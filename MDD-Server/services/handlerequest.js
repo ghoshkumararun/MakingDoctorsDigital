@@ -6,6 +6,33 @@ var crypto = require('crypto');
 var mysql = require('./mysql');
 
 
+function userSignIn(msg, callback) {
+    console.log("into signin function");
+    var json_responses;
+    var userSignIn = "select doctor_id, email from doctor_info where email='" + msg.dEmail + "' AND password='"+ msg.dPassword +"'";
+    console.log(userSignIn);
+    // check user already exists
+
+    mysql.fetchData(function (err, results)
+    {
+        console.log("The database consists of: ");
+        console.log(results);
+        if (results.length > 0)
+        {
+            console.log("email exists");
+            json_responses = {"statusCode": 200,"msg":"valid user","results":results}
+            callback(json_responses);
+        }
+        else
+        {
+            json_responses = {"statusCode": 401,"msg":"user already exists!"};
+            callback(json_responses);
+        }
+    },userSignIn);
+
+}
+
+
 function doctorSignUp(msg, callback){
 
     console.log("into doctor signup function");

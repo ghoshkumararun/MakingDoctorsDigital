@@ -57,8 +57,6 @@
                 console.log("inside sign in function");
                 var url = "/userSignIn";
 
-                console.log($scope.signIn.type+" 	"+$scope.signIn.email+" 	"+$scope.signIn.password);
-
                 if($scope.signIn.type == "admin"){
                     url+="Admin";
                 }else if($scope.signIn.type == "patient"){
@@ -73,7 +71,8 @@
                     data:{ username: $scope.signIn.email , password: $scope.signIn.password },
                     dataType: 'html'
                 }).then(function(res){
-                    if(res.data.status == "200"){
+                    if(res.data.statusCode == "200"){
+                        console.log("inside home redirecting.....");
                         if(res.data.signInAs == "patient"){
                             $window.location.href = '/patientHome';
                         }else if(res.data.signInAs == "admin"){
