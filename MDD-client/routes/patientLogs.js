@@ -23,7 +23,7 @@ exports.initializePLogger = function () {
     logger = new (winston.Logger)({
         transports: [
             new(winston.transports.File)({
-                filename : ' ../logs/patientLogs.log',
+                filename : 'logs/patientLogs.log',
                 timestamp: tsFormat,
                 level: env === 'development' ? 'debug' : 'info'
             })
@@ -34,7 +34,7 @@ exports.initializePLogger = function () {
 
 
 
-exports.insertLog = function (msg) {
+exports.insertPLog = function (msg) {
 
     logger.info(msg);
 }

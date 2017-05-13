@@ -47,9 +47,9 @@ function sessionEnd(req,res){
     }
 
     console.log("NO Session Exists..");
-    var result={"status":"200"};
-    res.send(result);
-
+    // var result={"status":"200"};
+    // res.send(result);
+    res.render("index");
 }
 
 exports.index = index;
