@@ -13,7 +13,7 @@ function getEncrypt (password) {
 }
 
 module.exports = function (passport) {
-    passport.use('login', new LocalStrategy({
+    passport.use('doctor_login', new LocalStrategy({
 
         emailField: 'email',
         passwordField: 'password'
@@ -24,7 +24,7 @@ module.exports = function (passport) {
         console.log("inside passport.js");
         console.log("Username is: "+email);
         console.log("Password is: "+encryptPassword);
-        var msg_payload = {"dEmail": email, "dPassword": encryptPassword, "methodName": "userSignIn"};
+        var msg_payload = {"dEmail": email, "dPassword": encryptPassword, "methodName": "userSignInDoctor"};
         mq_client.make_request('login_Queue', msg_payload, function (err, results) {
             if (err) {
                 console.log(err);
@@ -34,4 +34,25 @@ module.exports = function (passport) {
             }
         });
     }));
+    passport.use('patient_login', new LocalStrategy({
+
+            emailField: 'email',
+            passwordField: 'password'
+
+        },function (email, password, done) {
+
+            var encryptPassword = crypto.createHash("md5").update(password).digest('hex');
+            console.log("inside passport.js");
+            console.log("Username is: "+email);
+            console.log("Password is: "+encryptPassword);
+            var msg_payload = {"pEmail": email, "pPassword": encryptPassword, "methodName": "userSignInPatient"};
+            mq_client.make_request('login_Queue', msg_payload, function (err, results) {
+                if (err) {
+                    console.log(err);
+                }
+                else {
+                    done(null, results);
+                }
+            });
+        }));
 };

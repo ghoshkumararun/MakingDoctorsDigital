@@ -8,4 +8,3 @@ function doctorHome(req,res)
 }
 
 exports.doctorHome =doctorHome;
-

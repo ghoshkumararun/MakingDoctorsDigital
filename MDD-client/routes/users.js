@@ -51,8 +51,27 @@ function userSignInDoctor(req,res)
 function patientSignUp(req,res)
 {
     console.log("inside the patient signup module");
-    console.log(req.body);
-    res.send({"res.data.statusCode":"200"});
+    var encryptPassword = crypto.createHash("md5").update(req.body.patientDetails.pPassword).digest('hex');
+
+    var data = {"pEmail":req.body.patientDetails.pEmail, "pPassword": encryptPassword, "pFirstName":req.body.patientDetails.pFirstName,"pLastName": req.body.patientDetails.pLastName, "pPhoneNumber":req.body.patientDetails.pPhoneNumber,"pAddress":req.body.patientDetails.pAddress+", "+req.body.patientDetails.pCity+", "+req.body.patientDetails.pState+"- "+req.body.patientDetails.pZip,"pCreditCardNumber":req.body.patientDetails.pCreditCardNumber,"pCreditCardSC":req.body.patientDetails.pCreditCardSC,"pExpDate":req.body.patientDetails.pCreditCardMonth+"/"+req.body.patientDetails.pCreditCardYear,"methodName":"patientSignUp"};
+
+    mq_client.make_request('login_Queue',data, function(err,results){
+        if(err)
+        {
+            throw err;
+            res.send({"statusCode":"200"});
+        }
+        else
+        {
+            if(results.statusCode == "200")
+            {
+                req.session.data={"dEmail":results.dEmail};
+            }
+            res.send({"statusCode":"200"});
+        }
+    });
+
+    console.log("redirecting to signup.ejs----> doctorSignUp");
 }
 
 function userSignInPatient(req,res)

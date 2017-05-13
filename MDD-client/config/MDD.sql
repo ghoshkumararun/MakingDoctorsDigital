@@ -1,5 +1,9 @@
 create database mDD_session;
 
+create database MDD;
+
+use MDD;
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 

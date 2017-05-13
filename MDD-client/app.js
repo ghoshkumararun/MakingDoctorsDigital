@@ -129,7 +129,7 @@ app.get('/signin', index.signin);
 //Doctor
 app.post('/doctorSignUp',users.doctorSignUp);
 app.post('/userSignInDoctor', function(req, res, next) {
-    passport.authenticate('login', function(err, user, info) {
+    passport.authenticate('doctor_login', function(err, user, info) {
 
         console.log(user);
 
@@ -150,7 +150,7 @@ app.post('/userSignInDoctor', function(req, res, next) {
                 doctorLogs.insertDLog("userID: " + req.session.dId + " logged in");
             }, 0);
             console.log("session initilized")
-            return res.send({"statusCode":"200","signInAs":"doctor","msg":"valid user logging in"});
+            return res.send({"statusCode":"200","signInAs":"doctor","msg":"valid doctor logging in"});
         })
     })(req, res, next)
 });
@@ -158,12 +158,12 @@ app.post('/userSignInDoctor', function(req, res, next) {
 app.get('/doctorHome', doctor.doctorHome);
 
 
-
-
 //Patient
 app.post('/patientSignUp',users.patientSignUp);
-app.post('/userSignInPatient', function(req, res, next) {results
-    passport.authenticate('login', function(err, user, info) {
+app.post('/userSignInPatient', function(req, res, next) {
+    passport.authenticate('patient_login', function(err, user, info) {
+        console.log("inside authenticate method");
+        console.log(user);
 
         if(err) {
             return next(err);
@@ -175,17 +175,17 @@ app.post('/userSignInPatient', function(req, res, next) {results
             if(err) {
                 return next(err);
             }
-            req.session.email = user.results[0].email;
-            req.session.uid = user.results[0].patient_id;
+            req.session.userName = user.results[0].email;
+            req.session.pid = user.results[0].patient_id;
             setTimeout(function () {
-                patientLogs.insertPLog("userID: " + req.session.uid + " logged in");
+                patientLogs.insertPLog("userID: " + req.session.pid + " logged in");
             }, 0);
             console.log("session initilized")
-            return res.send("valid");
+            return res.send({"statusCode":"200","signInAs":"patient","msg":"valid patient logging in"});
         })
     })(req, res, next)
 });
-
+app.get('/patientHome', patient.patientHome);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

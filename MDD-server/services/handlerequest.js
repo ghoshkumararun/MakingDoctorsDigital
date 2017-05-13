@@ -7,9 +7,36 @@ var mysql = require('./mysql');
 
 
 function userSignIn(msg, callback) {
-    console.log("into signin function");
+    console.log("into doctor signin function");
     var json_responses;
     var userSignIn = "select doctor_id, email from doctor_info where email='" + msg.dEmail + "' AND password='"+ msg.dPassword +"'";
+    console.log(userSignIn);
+    // check user already exists
+
+    mysql.fetchData(function (err, results)
+    {
+        console.log("The database consists of: ");
+        console.log(results);
+        if (results.length > 0)
+        {
+            console.log("email exists");
+            json_responses = {"statusCode": 200,"msg":"valid user","results":results}
+            callback(json_responses);
+        }
+        else
+        {
+            json_responses = {"statusCode": 401,"msg":"user already exists!"};
+            callback(json_responses);
+        }
+    },userSignIn);
+
+}
+
+
+function userSignInPatient(msg, callback) {
+    console.log("into patient signin function");
+    var json_responses;
+    var userSignIn = "select patient_id, email from patient_info where email='" + msg.pEmail + "' AND password='"+ msg.pPassword +"'";
     console.log(userSignIn);
     // check user already exists
 
@@ -73,25 +100,50 @@ function doctorSignUp(msg, callback){
 }
 
 function patientSignUp(msg, callback){
+    console.log("into patient signup function");
+    console.log("*******************************************");
+    console.log(msg);
 
-/*
-    var sql1="select  * from tble ";
-    var sql2 = "insert into table values.....";
+    var json_responses;
+    var checkEmail = "select email from patient_info where email='" + msg.pEmail + "'";
+    console.log(checkEmail);
+    // check user already exists
 
-    Promise.all([sql1,sql2]).then({
-
-
-    }).catch()
-*/
-
-
-
+    mysql.fetchData(function (err, results)
+    {
+        console.log(results);
+        if (results.length > 0)
+        {
+            console.log("email exists");
+            json_responses = {"statusCode": 401,"msg":"user already exists!"};
+            callback(json_responses);
+        }
+        else
+        {
+            var insertPatient= "INSERT INTO `patient_info`(`first_name`, `last_name`, `email`, `password`, `phone_number`, `address`,`cCCNo`, `cCVV`, `cExpDate`) VALUES ("+"'"+msg.pFirstName+"', '"+msg.pLastName+"', '"+msg.pEmail+"','"+msg.pPassword+"','"+msg.pPhoneNumber+"','"+msg.pAddress+"','"+msg.pCreditCardNumber+"','"+msg.pCreditCardSC+"','"+msg.pExpDate+"')";
+            console.log(insertPatient)
+            mysql.insertData(function (err, results)
+            {
+                if (results.affectedRows > 0)
+                {
+                    console.log("valid Login");
+                    json_responses = {"statusCode": 200,"email":msg.pEmail};
+                    callback(json_responses);
+                }
+                else
+                {
+                    json_responses = {"statusCode": 401,"msg":"some error occured while registering"};
+                    callback(json_responses);
+                }
+            }, insertPatient);
+        }
+    }, checkEmail);
 }
 
 
 function handle_request(msg, callback){
 
-    if(msg.methodName == "userSignIn"){
+    if(msg.methodName == "userSignInDoctor"){
         userSignIn(msg,function(result){
             callback(null,result);
         });
@@ -102,6 +154,10 @@ function handle_request(msg, callback){
     } else if(msg.methodName == "patientSignUp"){
         console.log("Req in customer backend");
         patientSignUp(msg,function(result){
+            callback(null,result);
+        });
+    }else if(msg.methodName == "userSignInPatient"){
+        userSignInPatient(msg,function(result){
             callback(null,result);
         });
     }
