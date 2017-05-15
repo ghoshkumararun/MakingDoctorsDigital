@@ -6,12 +6,13 @@ angular
     .module('mwl.calendar.docs') //you will need to declare your module with the dependencies ['mwl.calendar', 'ui.bootstrap', 'ngAnimate']
     .controller('KitchenSinkCtrl', function(moment, alert, calendarConfig,$http, $scope) {
 
+        var vm = this;
         $http({
             method: "GET",
             url: '/getEvents'
         }).then(function (data) {
 
-                vm.events = data.data;
+            vm.events = data.data;
 
         });
         $scope.addAppointment = function(){
@@ -32,8 +33,6 @@ angular
                 });
             })
         }
-        var vm = this;
-
         //These variables MUST be set as a minimum for the calendar to work
         vm.calendarView = 'month';
         vm.viewDate = new Date();
