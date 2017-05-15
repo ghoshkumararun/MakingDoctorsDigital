@@ -14,6 +14,10 @@ var session = require("express-session");
 var MySQLStore = require('express-mysql-session')(session);
 require('./routes/passport')(passport);
 
+var mongo = require('mongodb');
+var monk = require('monk');
+var db = monk('localhost:27017/events');
+
 var app = express();
 var doctorLogs = require('./routes/doctorLogs');
 var patientLogs = require('./routes/patientLogs');
@@ -78,6 +82,44 @@ app.get('/sessionEnd', index.sessionEnd);
 app.get('/', index.index);
 // app.use('/users', users);
 
+
+//appointment
+app.get('/appointment', index.appointment);
+
+app.get('/getEvents', function (req, res){
+    var collection = db.get('usercollection');
+    //console.log(collection);
+    var x = collection.find();
+
+    collection.find({},{},function(e,docs){
+        res.send(docs);
+    })
+    var event = [];
+    event = [
+        {
+            "title": 'new event',
+            "startsAt": new Date(2017,4,1,13,30),
+            "endsAt": new Date(2017,4,1,14,0),
+            "draggable": true,
+            "resizable": true
+
+        }
+    ];
+    var response = {
+        statusCode: 200,
+        events: x
+    }
+    //res.send(response);
+});
+
+app.post('/addEvents',function doctorSignUp(req,res)
+{
+    var collection = db.get('usercollection');
+    collection.insert(req.body, {w: 1}, function(err, records){
+        console.log("Record added as ");
+    });
+    console.log(req.body);
+});
 
 //Signup and Signin
 app.get('/signup',index.signup);
