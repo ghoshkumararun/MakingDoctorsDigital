@@ -10,6 +10,7 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var patient = require('./routes/patient');
 var doctor = require('./routes/doctor');
+var admin = require('./routes/admin');
 var session = require("express-session");
 var MySQLStore = require('express-mysql-session')(session);
 require('./routes/passport')(passport);
@@ -86,6 +87,31 @@ app.get('/', index.index);
 //appointment
 app.get('/appointment', index.appointment);
 
+
+app.post('/userSignInAdmin', function(req, res, next) {
+    passport.authenticate('admin_login', function(err, user, info) {
+        console.log("inside authenticate method");
+        console.log(user);
+
+        if(err) {
+            return next(err);
+        }
+        if(!user) {
+            return res.send("invalid");
+        }
+        req.logIn(user, {session:false}, function(err) {
+            if(err) {
+                return next(err);
+            }
+            req.session.userName = user.results[0].email;
+            req.session.pid = user.results[0].patient_id;
+            console.log("session initilized")
+            return res.send({"statusCode":"200","signInAs":"admin","msg":"valid patient logging in"});
+        })
+    })(req, res, next)
+});
+app.get('/adminHome', admin.adminHome);
+
 app.get('/getEvents', function (req, res){
     var collection = db.get('usercollection');
     //console.log(collection);
@@ -102,7 +128,6 @@ app.get('/getEvents', function (req, res){
             "endsAt": new Date(2017,4,1,14,0),
             "draggable": true,
             "resizable": true
-
         }
     ];
     var response = {
@@ -115,6 +140,8 @@ app.get('/getEvents', function (req, res){
 app.post('/addEvents',function doctorSignUp(req,res)
 {
     var collection = db.get('usercollection');
+    var nummberofAppts = collection.find({},{"startsAt":req.body.startsAt});
+    console.log("*************************************"+nummberofAppts);
     collection.insert(req.body, {w: 1}, function(err, records){
         console.log("Record added as ");
     });
@@ -124,7 +151,6 @@ app.post('/addEvents',function doctorSignUp(req,res)
 //Signup and Signin
 app.get('/signup',index.signup);
 app.get('/signin', index.signin);
-
 
 //Doctor
 app.post('/doctorSignUp',users.doctorSignUp);
@@ -186,6 +212,8 @@ app.post('/userSignInPatient', function(req, res, next) {
     })(req, res, next)
 });
 app.get('/patientHome', patient.patientHome);
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

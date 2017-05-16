@@ -55,4 +55,26 @@ module.exports = function (passport) {
                 }
             });
         }));
+
+    passport.use('admin_login', new LocalStrategy({
+
+        emailField: 'email',
+        passwordField: 'password'
+
+    },function (email, password, done) {
+
+        var encryptPassword = crypto.createHash("md5").update(password).digest('hex');
+        console.log("inside passport.js");
+        console.log("Username is: "+email);
+        console.log("Password is: "+encryptPassword);
+        var msg_payload = {"aEmail": email, "aPassword": encryptPassword, "methodName": "userSignInAdmin"};
+        mq_client.make_request('login_Queue', msg_payload, function (err, results) {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                done(null, results);
+            }
+        });
+    }));
 };
