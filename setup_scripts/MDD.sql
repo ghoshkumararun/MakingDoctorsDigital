@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: May 13, 2017 at 11:50 PM
+-- Generation Time: May 17, 2017 at 01:24 AM
 -- Server version: 10.1.13-MariaDB
 -- PHP Version: 5.6.20
 
@@ -19,6 +19,25 @@ SET time_zone = "+00:00";
 --
 -- Database: `MDD`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin_info`
+--
+
+CREATE TABLE `admin_info` (
+  `admin_id` int(11) NOT NULL,
+  `admin_email` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `admin_info`
+--
+
+INSERT INTO `admin_info` (`admin_id`, `admin_email`, `password`) VALUES
+(1, 'admin@gmail.com', '2637a5c30af69a7bad877fdb65fbd78b');
 
 -- --------------------------------------------------------
 
@@ -41,6 +60,7 @@ CREATE TABLE `doctor_info` (
 --
 
 INSERT INTO `doctor_info` (`first_name`, `last_name`, `email`, `password`, `doctor_id`, `phone_number`, `address`) VALUES
+('Kajal', 'Chauhan', 'chauhan30.kajal@gmail.com', '80216d148f76008a098eafab6137559b', 1, 8139209490, '1 Wahington Sq, San Jose, CA- 95126'),
 ('Mohut', 'Patel', 'patel.mohit@gmail.com', '44072ea82a7494ac00d3f22cd04048b5', 2, 9999999999, '1 kjhbfkjhb, San Jose, CA- 95126');
 
 -- --------------------------------------------------------
@@ -76,6 +96,12 @@ INSERT INTO `patient_info` (`patient_id`, `first_name`, `last_name`, `email`, `p
 --
 
 --
+-- Indexes for table `admin_info`
+--
+ALTER TABLE `admin_info`
+  ADD PRIMARY KEY (`admin_id`);
+
+--
 -- Indexes for table `doctor_info`
 --
 ALTER TABLE `doctor_info`
@@ -95,6 +121,11 @@ ALTER TABLE `patient_info`
 -- AUTO_INCREMENT for dumped tables
 --
 
+--
+-- AUTO_INCREMENT for table `admin_info`
+--
+ALTER TABLE `admin_info`
+  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT for table `doctor_info`
 --
