@@ -27,7 +27,7 @@
   </head>
   <body ng-app="mDD_landing_app" ng-controller="mDD_landing_controller">
     <div class="container-fluid" id="big-container">
-        <div class="row" id="upper-part">
+        <div class="row">
             <div class="carousel slide fade-carousel" data-ride="carousel" data-interval="4000" id="bs-carousel">
               <!-- Overlay -->
               <!--<div class="overlay"></div>-->
@@ -48,7 +48,8 @@
                       <h1>Join the Givingest</h1>
                       <h3>Get start your next awesome project</h3>
                     </hgroup>
-                    <button class="btn btn-hero btn-lg" role="button">See all features</button>
+                      <button type="button" class="btn btn-lg btn-primary" ng-click="signIn()">Sign In</button>
+                      <button type="button" class="btn btn-lg btn-info" ng-click="signUp()">Signup</button>
                   </div>
                 </div>
                 <div class="item slides">
@@ -58,7 +59,8 @@
                       <h1>We are smart</h1>
                       <h3>Get start your next awesome project</h3>
                     </hgroup>
-                    <button class="btn btn-hero btn-lg" role="button">See all features</button>
+                      <button type="button" class="btn btn-lg btn-primary" ng-click="signIn()">Sign In</button>
+                      <button type="button" class="btn btn-lg btn-info" ng-click="signUp()">Signup</button>
                   </div>
                 </div>
                 <div class="item slides">
@@ -68,16 +70,12 @@
                       <h1>We are amazing</h1>
                       <h3>Get start your next awesome project</h3>
                     </hgroup>
-                    <button class="btn btn-hero btn-lg" role="button">See all features</button>
+                      <button type="button" class="btn btn-lg btn-primary" ng-click="signIn()">Sign In</button>
+                      <button type="button" class="btn btn-lg btn-info" ng-click="signUp()">Signup</button>
                   </div>
                 </div>
               </div>
             </div>
-        </div>
-
-        <div class="row" id="lower-part">
-            <div class="col-sm-6"><button type="button" class="btn btn-primary" ng-click="signIn()">Sign In</button></div>
-            <div class="col-sm-6"><button type="button" class="btn btn-info" ng-click="signUp()">Signup</button></div>
         </div>
     </div>
 
