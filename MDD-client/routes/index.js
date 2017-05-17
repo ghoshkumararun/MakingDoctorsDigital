@@ -23,6 +23,13 @@ function signin(req,res)
     res.render('signin');
 }
 
+function appointment(req,res)
+{
+    console.log("inside the appointment module");
+    res.render('appointment');
+}
+
+
 function session(req,res){
     console.log("inside session");
     console.log(req.session.data);
@@ -55,6 +62,7 @@ function sessionEnd(req,res){
 exports.index = index;
 exports.signup = signup;
 exports.signin = signin;
+exports.appointment = appointment;
 exports.session=session;
 exports.sessionEnd=sessionEnd;
 

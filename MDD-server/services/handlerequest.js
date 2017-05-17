@@ -6,16 +6,16 @@ var crypto = require('crypto');
 var mysql = require('./mysql');
 
 
-function userSignIn(msg, callback) {
+function userSignInDoctor(msg, callback) {
     console.log("into doctor signin function");
     var json_responses;
-    var userSignIn = "select doctor_id, email from doctor_info where email='" + msg.dEmail + "' AND password='"+ msg.dPassword +"'";
-    console.log(userSignIn);
+    var doctorSignIn = "select doctor_id, email from doctor_info where email='" + msg.dEmail + "' AND password='"+ msg.dPassword +"'";
+    console.log(doctorSignIn);
     // check user already exists
 
     mysql.fetchData(function (err, results)
     {
-        console.log("The database consists of: ");
+        console.log("The doctor database consists of: ");
         console.log(results);
         if (results.length > 0)
         {
@@ -25,7 +25,7 @@ function userSignIn(msg, callback) {
         }
         else
         {
-            json_responses = {"statusCode": 401,"msg":"user already exists!"};
+            json_responses = {"statusCode": 401,"msg":"invalid user or credentials"};
             callback(json_responses);
         }
     },userSignIn);
@@ -36,13 +36,13 @@ function userSignIn(msg, callback) {
 function userSignInPatient(msg, callback) {
     console.log("into patient signin function");
     var json_responses;
-    var userSignIn = "select patient_id, email from patient_info where email='" + msg.pEmail + "' AND password='"+ msg.pPassword +"'";
-    console.log(userSignIn);
+    var patientSignIn = "select patient_id, email from patient_info where email='" + msg.pEmail + "' AND password='"+ msg.pPassword +"'";
+    console.log(patientSignIn);
     // check user already exists
 
     mysql.fetchData(function (err, results)
     {
-        console.log("The database consists of: ");
+        console.log("The Patient database consists of: ");
         console.log(results);
         if (results.length > 0)
         {
@@ -52,13 +52,36 @@ function userSignInPatient(msg, callback) {
         }
         else
         {
-            json_responses = {"statusCode": 401,"msg":"user already exists!"};
+            json_responses = {"statusCode": 401,"msg":"invalid user or credentials"};
             callback(json_responses);
         }
-    },userSignIn);
-
+    },patientSignIn);
 }
 
+function userSignInAdmin(msg, callback) {
+    console.log("into admin signin function");
+    var json_responses;
+    var adminSignIn = "select admin_id, admin_email from admin_info where admin_email='" + msg.aEmail + "' AND password='"+ msg.aPassword +"'";
+    console.log(adminSignIn);
+    // check user already exists
+
+    mysql.fetchData(function (err, results)
+    {
+        console.log("The *Admin* database consists of: ");
+        console.log(results);
+        if (results.length > 0)
+        {
+            console.log("email exists");
+            json_responses = {"statusCode": 200,"msg":"valid user","results":results}
+            callback(json_responses);
+        }
+        else
+        {
+            json_responses = {"statusCode": 401,"msg":"invalid user or credentials"};
+            callback(json_responses);
+        }
+    },adminSignIn);
+}
 
 function doctorSignUp(msg, callback){
 
@@ -144,7 +167,7 @@ function patientSignUp(msg, callback){
 function handle_request(msg, callback){
 
     if(msg.methodName == "userSignInDoctor"){
-        userSignIn(msg,function(result){
+        userSignInDoctor(msg,function(result){
             callback(null,result);
         });
     }else if(msg.methodName == "doctorSignUp"){
@@ -158,6 +181,10 @@ function handle_request(msg, callback){
         });
     }else if(msg.methodName == "userSignInPatient"){
         userSignInPatient(msg,function(result){
+            callback(null,result);
+        });
+    }else if(msg.methodName == "userSignInAdmin"){
+        userSignInAdmin(msg,function(result){
             callback(null,result);
         });
     }

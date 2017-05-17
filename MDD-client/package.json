@@ -18,6 +18,8 @@
     "express-mysql-session": "^1.2.0",
     "express-session": "^1.15.2",
     "fs": "0.0.1-security",
+    "mongodb": "^2.2.26",
+    "monk": "^4.0.0",
     "morgan": "~1.7.0",
     "mysql": "^2.13.0",
     "passport": "^0.3.2",
@@ -26,5 +28,9 @@
     "sequelize": "^3.30.4",
     "serve-favicon": "~2.3.0",
     "winston": "^2.3.1"
+  },
+  "devDependencies": {
+    "mongodb": "^2.2.26",
+    "oauth": "^0.9.15"
   }
 }

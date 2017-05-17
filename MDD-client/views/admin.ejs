@@ -15,12 +15,6 @@
     <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <script>
-        function takeAppointment()
-        {
-            window.location.href = "http://localhost:8000/";        //link to the face recognition system
-        }
-    </script>
 </head>
 <body>
 <div class="navbar navbar-fixed-top">
@@ -90,17 +84,21 @@
                         <div class="widget-header"> <i class="icon-list-alt"></i>
                             <h3> Today's Stats</h3>
                         </div>
-
-
                         <!-- /widget-header -->
                         <div class="widget-content">
                             <div class="widget big-stats-container">
                                 <div class="widget-content">
                                     <div id="big_stats" class="cf">
-                                        <div class="stat"><div class="col-sm-6"><button type="button" style="height:70px;" class="btn btn-primary" onclick="takeAppointment()">Take Appointment</button></div> </div>
+                                        <div class="stat"><p>Total appointments</p> <span class="value">20</span> </div>
                                         <!-- .stat -->
 
-                                        <div class="stat"> <div class="col-sm-6"><button type="button" style="height:70px;" class="btn btn-danger" ng-click="cancelAppointment()">Cancel Appointment</button></div> </div>
+                                        <div class="stat"> <p>Completed appointments</p> <span class="value">15</span> </div>
+                                        <!-- .stat -->
+
+                                        <div class="stat"> <p>Appointments left</p> <span class="value">5</span> </div>
+                                        <!-- .stat -->
+
+
                                         <!-- .stat -->
                                     </div>
                                 </div>
@@ -138,7 +136,7 @@
                                 <a href="javascript:;" class="shortcut"><i class="shortcut-icon icon-user"></i><span class="shortcut-label">User Info</span> </a>
                                 <a href="javascript:;" class="shortcut"><i class="shortcut-icon icon-file"></i><span class="shortcut-label">Notes</span> </a>
                                 <a href="http://localhost:5000/dashboard" class="shortcut"><i class="shortcut-icon icon-file"></i><span class="shortcut-label">Fitbit Data</span> </a>
-                                <a href="javascript:;" class="shortcut"> <span class="glyphicons glyphicons-watch">Price Compare</span></a>
+                                <a href="javascript:;" class="shortcut"> <i class="shortcut-icon icon-tag"></i><span class="shortcut-label">Tags</span> </a>
                             </div>
                             <!-- /shortcuts -->
                         </div>
@@ -157,11 +155,11 @@
                         <!-- /widget-content -->
                     </div>
                     <!-- /widget -->
-                    <!--<div class="widget widget-table action-table">
+                    <div class="widget widget-table action-table">
                         <div class="widget-header"> <i class="icon-th-list"></i>
                             <h3>A Table Example</h3>
                         </div>
-                        &lt;!&ndash; /widget-header &ndash;&gt;
+                        <!-- /widget-header -->
                         <div class="widget-content">
                             <table class="table table-striped table-bordered">
                                 <thead>
@@ -201,8 +199,8 @@
                                 </tbody>
                             </table>
                         </div>
-                        &lt;!&ndash; /widget-content &ndash;&gt;
-                    </div>-->
+                        <!-- /widget-content -->
+                    </div>
 
                 </div>
                 <!-- /span6 -->
