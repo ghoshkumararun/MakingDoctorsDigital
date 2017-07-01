@@ -28,7 +28,7 @@ function userSignInDoctor(msg, callback) {
             json_responses = {"statusCode": 401,"msg":"invalid user or credentials"};
             callback(json_responses);
         }
-    },userSignIn);
+    },doctorSignIn);
 
 }
 
@@ -124,7 +124,6 @@ function doctorSignUp(msg, callback){
 
 function patientSignUp(msg, callback){
     console.log("into patient signup function");
-    console.log("*******************************************");
     console.log(msg);
 
     var json_responses;
