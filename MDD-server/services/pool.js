@@ -18,7 +18,7 @@ function getConnection(){
 }
 
 function createPool(initialsize, maxSize){
-    console.log("Connection Pool is creaated");
+    console.log("Connection Pool is created");
     maxPoolSize = maxSize;
     for(var i=0;i<initialsize;i++){
         connectionpool.push(getConnection());

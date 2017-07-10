@@ -45,7 +45,7 @@ function session(req,res){
     }
 }
 
-function sessionEnd(req,res){
+function logout(req,res){
 
     if(req.session.data){
         console.log("Session Exists..Destroying Session");
@@ -64,5 +64,5 @@ exports.signup = signup;
 exports.signin = signin;
 exports.appointment = appointment;
 exports.session=session;
-exports.sessionEnd=sessionEnd;
+exports.logout=logout;
 

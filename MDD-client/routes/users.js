@@ -26,7 +26,7 @@ function doctorSignUp(req,res)
         if(err)
         {
             throw err;
-            res.send({"statusCode":"200"});
+            res.send({"statusCode":"400"});
         }
         else
         {
@@ -53,13 +53,13 @@ function patientSignUp(req,res)
     console.log("inside the patient signup module");
     var encryptPassword = crypto.createHash("md5").update(req.body.patientDetails.pPassword).digest('hex');
 
-    var data = {"pEmail":req.body.patientDetails.pEmail, "pPassword": encryptPassword, "pFirstName":req.body.patientDetails.pFirstName,"pLastName": req.body.patientDetails.pLastName, "pPhoneNumber":req.body.patientDetails.pPhoneNumber,"pAddress":req.body.patientDetails.pAddress+", "+req.body.patientDetails.pCity+", "+req.body.patientDetails.pState+"- "+req.body.patientDetails.pZip,"pCreditCardNumber":req.body.patientDetails.pCreditCardNumber,"pCreditCardSC":req.body.patientDetails.pCreditCardSC,"pExpDate":req.body.patientDetails.pCreditCardMonth+"/"+req.body.patientDetails.pCreditCardYear,"methodName":"patientSignUp"};
+    var data = {"pEmail":req.body.patientDetails.pEmail, "pPassword": encryptPassword, "pFirstName":req.body.patientDetails.pFirstName,"pLastName": req.body.patientDetails.pLastName, "pPhoneNumber":req.body.patientDetails.pPhoneNumber,"pAddress":req.body.patientDetails.pAddress, "pCity":req.body.patientDetails.pCity, "pState":req.body.patientDetails.pState, "pZip":req.body.patientDetails.pZip,"pCreditCardNumber":req.body.patientDetails.pCreditCardNumber,"pCreditCardSC":req.body.patientDetails.pCreditCardSC,"pExpDate":req.body.patientDetails.pCreditCardMonth+"/"+req.body.patientDetails.pCreditCardYear,"methodName":"patientSignUp"};
 
     mq_client.make_request('login_Queue',data, function(err,results){
         if(err)
         {
             throw err;
-            res.send({"statusCode":"200"});
+            res.send({"statusCode":"400"});
         }
         else
         {

@@ -11,18 +11,131 @@
     <link href="/css/font-awesome.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
     <link href="/css/pages/dashboard.css" rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/12.2.13/ng-file-upload-all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/12.2.13/FileAPI.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/12.2.13/ng-file-upload.min.js"></script>
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <script>
-        function takeAppointment()
-        {
-            window.location.href = "http://localhost:8000/";        //link to the face recognition system
-        }
+
+        var app = angular.module("MDD_phome_app", ['ngFileUpload']);
+        app.controller("MDD_phome_controller", ['Upload','$http','$scope','$window',function(Upload,$http,$scope,$window) {
+
+            $scope.patientHome_Show = true;
+
+            $scope.genericShow=function(){
+
+                $scope.patientHome_Show = false;
+                $scope.patientDetails_Show = false;
+                $scope.patientReports_Show = false;
+                $scope.patientPasswordUpdate_Show = false;
+                $scope.patientAddCreditCard_Show = false;
+
+            }
+
+            $scope.takeAppointment = function() {
+                console.log("**************************take appointment*****************");
+                window.location.href = "http://localhost:8000/";        //link to the face recognition system
+            }
+
+            $scope.patientDetails= function(){
+                $scope.genericShow();
+                $http({
+                    method:'get',
+                    url:'/patientDetails'
+                }).then(function(res){
+                    if(res.data.statusCode == "200"){
+                        console.log("works fine");
+                        $scope.patient={"pEmail":res.data.patient.email,"pFirstName":res.data.patient.first_name,"pLastName":res.data.patient.last_name,"pPhoneNumber":res.data.patient.phone_number,"pAddress":res.data.patient.address,"pCity":res.data.patient.city,"pState":res.data.patient.state,"pZip":res.data.patient.zip};
+                        $scope.patientDetails_Show = true;
+                    }
+                });
+
+            }
+
+            $scope.patientUpdateDetails=function(){
+                console.log("updating patient details");
+                $scope.genericShow();
+                var serverData = {"patient": $scope.patient};
+                $http({
+                    method:'post',
+                    url:'/updatePatientDetails',
+                    data: serverData
+                }).then(function(res){
+                    if(res.data.statusCode == "200"){
+                        console.log("works fine");
+                        $scope.patient={"pEmail":res.data.patient.email,"pFirstName":res.data.patient.first_name,"pLastName":res.data.patient.last_name,"pPhoneNumber":res.data.patient.phone_number,"pAddress":res.data.patient.address,"pCity":res.data.patient.city,"pState":res.data.patient.state,"pZip":res.data.patient.zip};
+                        $scope.patientDetails_Show = true;
+                    }
+                });
+            }
+
+            $scope.passwordShow=function(){
+                $scope.genericShow();
+                $scope.patientPasswordUpdate_Show = true;
+                $scope.patientDetails_Show = false;
+            }
+
+            $scope.passwordUpdate = function(){
+
+                var serverData = {"password":$scope.password}
+                console.log(serverData);
+                $http({
+                    method:'post',
+                    url:'/patientUpdatePassword',
+                    data:serverData
+                }).then(function(res){
+                    if(res.data.status == "200"){
+                        alert("Password Details Changed Successfully, Please Login to Continue");
+                        $scope.logout();
+                    }else{
+                        $scope.serverPasswordError = res.data.msg;
+                    }
+                });
+
+            }
+
+            $scope.addCreditCardShow=function(){
+                $scope.genericShow();
+                $scope.patientAddCreditCard_Show = true;
+                $scope.patientDetails_Show = false;
+            }
+
+            $scope.patientReports = function(){
+
+                console.log("redirecting to reports page");
+                $window.location.href = '/patientReports';
+
+            }
+
+             $scope.reportsUpload = function() {
+                console.log("reports");
+                $http({
+                    method:'get',
+                    url:'/reports'
+                }).then(function(res){
+                    if(res.data.statusCode == "200"){
+//                        $scope.file_Show=true;
+                    }else{
+                        alert(res.data.msg);
+                    }
+                });
+             }
+
+             $scope.logout= function(){
+                console.log("called logouts");
+                $window.location.href = "/logout";
+             }
+
+        }]);
     </script>
 </head>
-<body>
+<body ng-app="MDD_phome_app" ng-controller="MDD_phome_controller">
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container"> <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span
@@ -33,58 +146,31 @@
                                     class="icon-cog"></i> Account <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li><a href="javascript:;">Profile</a></li>
-                            <li><a href="/sessionEnd">Logout</a></li>
+                            <li><a ng-click="logout()">Logout</a></li>
                         </ul>
                     </li>
-                    <!--<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i
-                                    class="icon-user"></i> MDD.com <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="javascript:;">Profile</a></li>
-                            <li><a href="javascript:;">Logout</a></li>
-                        </ul>
-                    </li>-->
                 </ul>
                 <form class="navbar-search pull-right">
                     <input type="text" class="search-query" placeholder="Search">
                 </form>
             </div>
-            <!--/.nav-collapse -->
+
         </div>
-        <!-- /container -->
+
     </div>
-    <!-- /navbar-inner -->
+
 </div>
 <!-- /navbar -->
 <div class="subnavbar">
-    <div class="subnavbar-inner">
-        <div class="container">
-            <ul class="mainnav">
-                <li class="active"><a href="index.html"><i class="icon-dashboard"></i><span>Dashboard</span> </a> </li>
-                <li><a href="reports.html"><i class="icon-list-alt"></i><span>Reports</span> </a> </li>
-                <li><a href="guidely.html"><i class="icon-facetime-video"></i><span>App Tour</span> </a></li>
-                <li><a href="charts.html"><i class="icon-bar-chart"></i><span>Charts</span> </a> </li>
-                <li><a href="shortcodes.html"><i class="icon-code"></i><span>Shortcodes</span> </a> </li>
-                <li class="dropdown"><a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-long-arrow-down"></i><span>Drops</span> <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="icons.html">Icons</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
-                        <li><a href="pricing.html">Pricing Plans</a></li>
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="signup.html">Signup</a></li>
-                        <li><a href="error.html">404</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-        <!-- /container -->
-    </div>
-    <!-- /subnavbar-inner -->
+
 </div>
 <!-- /subnavbar -->
 <div class="main">
     <div class="main-inner">
         <div class="container">
-            <div class="row">
+
+
+            <div class="row" ng-show="patientHome_Show">
                 <div class="span6">
                     <div class="widget widget-nopad">
                         <div class="widget-header"> <i class="icon-list-alt"></i>
@@ -97,7 +183,7 @@
                             <div class="widget big-stats-container">
                                 <div class="widget-content">
                                     <div id="big_stats" class="cf">
-                                        <div class="stat"><div class="col-sm-6"><button type="button" style="height:70px;" class="btn btn-primary" onclick="takeAppointment()">Take Appointment</button></div> </div>
+                                        <div class="stat"><div class="col-sm-6"><button type="button" style="height:70px;" class="btn btn-primary" ng-click="takeAppointment()">Take Appointment</button></div> </div>
                                         <!-- .stat -->
 
                                         <div class="stat"> <div class="col-sm-6"><button type="button" style="height:70px;" class="btn btn-danger" ng-click="cancelAppointment()">Cancel Appointment</button></div> </div>
@@ -115,9 +201,9 @@
                             <h3>Today's Appointments</h3>
                         </div>
                         <!-- /widget-header -->
-                        <div class="widget-content">
+                        <!--<div class="widget-content">
                             <iframe src="http://localhost:3000/appointment" width="100%"  height="830"></iframe>
-                        </div>
+                        </div>-->
                         <!-- /widget-content -->
                     </div>
 
@@ -133,9 +219,9 @@
                             <div class="shortcuts">
                                 <a href="javascript:;" class="shortcut"><i class="shortcut-icon icon-list-alt"></i><span class="shortcut-label">Medical History</span> </a>
                                 <a href="javascript:;" class="shortcut"><i class="shortcut-icon icon-bookmark"></i><span class="shortcut-label">Bookmarks</span> </a>
-                                <a href="javascript:;" class="shortcut"><i class="shortcut-icon icon-signal"></i><span class="shortcut-label">Reports</span> </a>
+                                <a href="" class="shortcut"><i class="shortcut-icon icon-signal" ></i><span class="shortcut-label" ng-click="patientReports()">Reports</span> </a>
                                 <a href="javascript:;" class="shortcut"> <i class="shortcut-icon icon-comment"></i><span class="shortcut-label">Comments</span> </a>
-                                <a href="javascript:;" class="shortcut"><i class="shortcut-icon icon-user"></i><span class="shortcut-label">User Info</span> </a>
+                                <a href="javascript:;" class="shortcut"><i class="shortcut-icon icon-user"></i><span class="shortcut-label" ng-click="patientDetails()">User Info</span> </a>
                                 <a href="javascript:;" class="shortcut"><i class="shortcut-icon icon-file"></i><span class="shortcut-label">Notes</span> </a>
                                 <a href="http://localhost:5000/dashboard" class="shortcut"><i class="shortcut-icon icon-file"></i><span class="shortcut-label">Fitbit Data</span> </a>
                                 <a href="javascript:;" class="shortcut"> <span class="glyphicons glyphicons-watch">Price Compare</span></a>
@@ -157,56 +243,250 @@
                         <!-- /widget-content -->
                     </div>
                     <!-- /widget -->
-                    <!--<div class="widget widget-table action-table">
-                        <div class="widget-header"> <i class="icon-th-list"></i>
-                            <h3>A Table Example</h3>
-                        </div>
-                        &lt;!&ndash; /widget-header &ndash;&gt;
-                        <div class="widget-content">
-                            <table class="table table-striped table-bordered">
-                                <thead>
-                                <tr>
-                                    <th> Patient </th>
-                                    <th> Time </th>
-                                    <th class="td-actions"> </th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td> Patient 1 </td>
-                                    <td> 1:00 - 1:15 pm </td>
-                                    <td class="td-actions"><a href="javascript:;" class="btn btn-small btn-success"><i class="btn-icon-only icon-ok"> </i></a><a href="javascript:;" class="btn btn-danger btn-small"><i class="btn-icon-only icon-remove"> </i></a></td>
-                                </tr>
-                                <tr>
-                                    <td> Patient 2 </td>
-                                    <td> 1:15 - 1:30 pm </td>
-                                    <td class="td-actions"><a href="javascript:;" class="btn btn-small btn-success"><i class="btn-icon-only icon-ok"> </i></a><a href="javascript:;" class="btn btn-danger btn-small"><i class="btn-icon-only icon-remove"> </i></a></td>
-                                </tr>
-                                <tr>
-                                    <td> Patient 3 </td>
-                                    <td> 1:30 - 1:45 pm </td>
-                                    <td class="td-actions"><a href="javascript:;" class="btn btn-small btn-success"><i class="btn-icon-only icon-ok"> </i></a><a href="javascript:;" class="btn btn-danger btn-small"><i class="btn-icon-only icon-remove"> </i></a></td>
-                                </tr>
-                                <tr>
-                                    <td> Patient 4 </td>
-                                    <td> 1:45 - 2:00 pm </td>
-                                    <td class="td-actions"><a href="javascript:;" class="btn btn-small btn-success"><i class="btn-icon-only icon-ok"> </i></a><a href="javascript:;" class="btn btn-danger btn-small"><i class="btn-icon-only icon-remove"> </i></a></td>
-                                </tr>
-                                <tr>
-                                    <td> Patient 5 </td>
-                                    <td> 2:00 - 2:15 pm </td>
-                                    <td class="td-actions"><a href="javascript:;" class="btn btn-small btn-success"><i class="btn-icon-only icon-ok"> </i></a><a href="javascript:;" class="btn btn-danger btn-small"><i class="btn-icon-only icon-remove"> </i></a></td>
-                                </tr>
-
-                                </tbody>
-                            </table>
-                        </div>
-                        &lt;!&ndash; /widget-content &ndash;&gt;
-                    </div>-->
 
                 </div>
                 <!-- /span6 -->
             </div>
+
+            <div class="row" ng-show="patientDetails_Show">
+                    <form role="form" id="" name="patientUpdateForm" class="form-horizontal">
+
+                        <div class="heading form-left">
+                            <h3><strong>Update Profile</strong> </h3>
+                        </div>
+
+                        <div class="form-group form-left">
+
+
+                            <div class="col-xs-3 col-mn">
+                                <input class="form-control form-inp" type="text" id="pEmail"
+                                       name="pEmail" ng-model="patient.pEmail" autocomplete="on"
+                                       autofocus aria-required="true" placeholder="Email *"
+                                       maxlength=30 ng-pattern="/[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}/" required>
+                                <span>
+										<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+										<span ng-show="patientUpdateForm.pEmail.$error.pattern" class="alert alert-warning">Please enter valid email</span>
+    									<span ng-show="patientUpdateForm.pEmail.$error.required && patientUpdateForm.pEmail.$dirty" class="alert alert-danger"><strong>Email</strong> is required</span>
+    								</span>
+                            </div>
+
+                            <div class="col-xs-3 col-mn">
+                                <input class="form-control form-inp" type="text" id="pFirstName"
+                                       name="pFirstName" ng-model="patient.pFirstName" autocomplete="on"
+                                       autofocus aria-required="true" placeholder="First Name *"
+                                       maxlength=20 ng-pattern="/^[A-Za-z ]*$/" required>
+                                <span>
+										<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+										<span ng-show="patientUpdateForm.pFirstName.$error.pattern" class="alert alert-warning">First name must contain letters only</span>
+    									<span ng-show="patientUpdateForm.pFirstName.$error.required && patientUpdateForm.pFirstName.$dirty" class="alert alert-danger"><strong>First name</strong> is required</span>
+    								</span>
+                            </div>
+
+                            <div class="col-xs-3 col-mn">
+                                <input class="form-control form-inp" type="text" id="pLastName"
+                                       name="pLastName" ng-model="patient.pLastName" autocomplete="on"
+                                       autofocus aria-required="true" placeholder="Last Name *"
+                                       maxlength=20 ng-pattern="/^[A-Za-z ]*$/" required>
+                                <span>
+										<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+										<span ng-show="patientUpdateForm.pLastName.$error.pattern" class="alert alert-warning">Last name must contain letters only</span>
+    									<span ng-show="patientUpdateForm.pLastName.$error.required && patientUpdateForm.pLastName.$dirty" class="alert alert-danger"><strong>Last name</strong> is required</span>
+    								</span>
+                            </div>
+
+                            <div class="col-xs-3 col-mn">
+                                <input class="form-control form-inp" type="text"
+                                       name="pPhoneNumber" ng-model="patient.pPhoneNumber" autocomplete="on"
+                                       autofocus aria-required="true" placeholder="Phone Number *"
+                                       ng-maxlength=10 ng-minlength=10 maxlength=10 ng-pattern="/[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}/" required>
+                                <span>
+										<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+										<span ng-show="patientUpdateForm.pPhoneNumber.$error.pattern || patientUpdateForm.pPhoneNumber.$error.maxlength || patientUpdateForm.pPhoneNumber.$error.minlength" class="alert alert-warning">Phone number must be 10 digit long and should contain numbers only</span>
+										<span ng-show="patientUpdateForm.pPhoneNumber.$error.required && patientUpdateForm.pPhoneNumber.$dirty" class="alert alert-danger"><strong>Phone number</strong> is required</span>
+    								</span>
+                            </div>
+
+
+                            <div class="col-xs-3 col-mn">
+                                <input class="form-control form-inp" type="text"
+                                       name="pAddress" ng-model="patient.pAddress" autocomplete="on"
+                                       autofocus aria-required="true" placeholder="Address *"
+                                       maxlength=40 ng-pattern="/[A-Za-z0-9. ]/" required>
+                                <span>
+										<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+											<span ng-show="patientUpdateForm.pAddress.$error.required && patientUpdateForm.pAddress.$dirty" class="alert alert-danger"><strong>Address</strong> is required</span>
+    									</span>
+                                </span>
+                            </div>
+
+                            <div class="col-xs-3 col-mn">
+                                <input class="form-control form-inp" type="text"
+                                       name="pCity" ng-model="patient.pCity" autocomplete="on"
+                                       autofocus aria-required="true" placeholder="City *"
+                                       maxlength=20 ng-pattern="/^[A-Za-z ]*$/" required>
+                                <span>
+										<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+										<span ng-show="patientUpdateForm.pCity.$error.pattern" class="alert alert-warning">City name must contain letters only</span>
+										<span ng-show="patientUpdateForm.pCity.$error.required && patientUpdateForm.pCity.$dirty" class="alert alert-danger"><strong>City name</strong> is required</span>
+    								</span>
+                            </div>
+
+                            <div class="col-xs-3 col-mn">
+
+                                <select name="pState" ng-model="patient.pState" required     background-color: #669900;    color: #fff;>
+                                    <option value="">Select State</option>
+                                    <option value="AL">AL</option>
+                                    <option value="AK">AK</option>
+                                    <option value="AZ">AZ</option>
+                                    <option value="AR">AR</option>
+                                    <option value="CA">CA</option>
+                                    <option value="CO">CO</option>
+                                    <option value="CT">CT</option>
+                                    <option value="DE">DE</option>
+                                    <option value="FL">FL</option>
+                                    <option value="GA">GA</option>
+                                    <option value="HI">HI</option>
+                                    <option value="ID">ID</option>
+                                    <option value="IL">IL</option>
+                                    <option value="IN">IN</option>
+                                    <option value="IA">IA</option>
+                                    <option value="KS">KS</option>
+                                    <option value="KY">KY</option>
+                                    <option value="LA">LA</option>
+                                    <option value="ME">ME</option>
+                                    <option value="MD">MD</option>
+                                    <option value="MA">MA</option>
+                                    <option value="MI">MI</option>
+                                    <option value="MN">MN</option>
+                                    <option value="MS">MS</option>
+                                    <option value="MO">MO</option>
+                                    <option value="MT">MT</option>
+                                    <option value="NE">NE</option>
+                                    <option value="NV">NV</option>
+                                    <option value="NH">NH</option>
+                                    <option value="NJ">NJ</option>
+                                    <option value="NM">NM</option>
+                                    <option value="NY">NY</option>
+                                    <option value="NC">NC</option>
+                                    <option value="ND">ND</option>
+                                    <option value="OH">OH</option>
+                                    <option value="OK">OK</option>
+                                    <option value="OR">OR</option>
+                                    <option value="PA">PA</option>
+                                    <option value="RI">RI</option>
+                                    <option value="SC">SC</option>
+                                    <option value="SD">SD</option>
+                                    <option value="TN">TN</option>
+                                    <option value="TX">TX</option>
+                                    <option value="UT">UT</option>
+                                    <option value="VT">VT</option>
+                                    <option value="">VA</option>
+                                    <option value="WA">WA</option>
+                                    <option value="WV">WV</option>
+                                    <option value="WI">WI</option>
+                                    <option value="WY">WY</option>
+                                    <option value="DC">DC</option>
+                                </select>
+
+                                <span>
+										<span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
+										<span ng-show="patientUpdateForm.pState.$error.required && patientUpdateForm.pState.$dirty" class="alert alert-danger">State name is required</span>
+    								</span>
+                            </div>
+
+
+
+
+                            <div class="col-xs-3 col-mn">
+                                <input class="form-control form-inp" type="text"
+                                       name="pZip" ng-model="patient.pZip" autocomplete="on"
+                                       autofocus aria-required="true" placeholder="Zip Code *"
+                                       ng-minlength=5 ng-maxlength=5 maxlength=5 ng-pattern="/^\d+$/" required>
+                                <span>
+										<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+										<span ng-show="patientUpdateForm.pZip.$error.pattern || patientUpdateForm.pZip.$error.maxlength || patientUpdateForm.pZip.$error.minlength" class="alert alert-warning">Zip code must be 4-6 digit long and should contain numbers only</span>
+										<span ng-show="patientUpdateForm.pZip.$error.required && patientUpdateForm.pZip.$dirty" class="alert alert-danger"><strong>Zip code</strong> is required</span>
+    								</span>
+                            </div>
+
+                            <div>
+                                <span style="color:red">{{serverError}}</span>
+                            </div>
+
+                            <div class="doit">
+                                <input class="btn btn-success but1 col-mn1" type="submit"
+                                       id="submit_button" value="Update Details" ng-click="patientUpdateDetails()" ng-disabled="patientUpdateForm.$invalid">
+                            </div>
+                            <div class="doit">
+                                <button class="btn btn-success but1 col-mn1" id="submit_button" value="Change Password" ng-click="passwordShow()">Change Password</button>
+                            </div>
+                            <div class="doit">
+                                <button class="btn btn-success but1 col-mn1" id="submit_button" value="Add Credit Card" ng-click="addCreditCardShow()">Add Credit Card</button>
+                            </div>
+
+                        </div>
+                    </form>
+            </div>
+
+
+            <div ng-show="patientPasswordUpdate_Show">
+                <form id="" name="patientPasswordForm" class="form-horizontal">
+
+                    <div class="heading form-left">
+                        <h3><strong>Update Password</strong> </h3>
+                    </div>
+                    <div class="form-group form-left">
+                        <div class="col-xs-3 col-mn2">
+                            <input class="form-control form-inp" type="password" id="pOldPassword" name="pOldPassword"
+                                   ng-model="password.pOldPassword" autocomplete="on" autofocus
+                                   aria-required="true" placeholder="Old Password *" maxlength=30
+                                   ng-pattern="/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*([-+_!@#$%^&*.,?])).{5,7}/"
+                                   required> <span> <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span
+                            ng-show="patientPasswordForm.pOldPassword.$error.pattern" class="alert alert-warning"><strong>Password</strong>
+                        must contain a Number, Capital Letter, Small Letter and Special
+                        Character</span> <span
+                                        ng-show="patientPasswordForm.pOldPassword.$error.required && patientPasswordForm.pOldPassword.$dirty" class="alert alert-danger"><strong>Password</strong>
+                        is required</span>
+                </span>
+                        </div>
+                        <div class="col-xs-3 col-mn2">
+                            <input class="form-control form-inp" type="password" id="pNewPassword" name="pNewPassword"
+                                   ng-model="password.pNewPassword" autocomplete="on" autofocus
+                                   aria-required="true" placeholder="New Password *" maxlength=30
+                                   ng-pattern="/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*([-+_!@#$%^&*.,?])).{5,7}/"
+                                   required> <span> <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span
+                            ng-show="patientPasswordForm.pNewPassword.$error.pattern" class="alert alert-warning"><strong>Password</strong>
+                        must contain a Number, Capital Letter, Small Letter and Special
+                        Character</span> <span
+                                        ng-show="patientPasswordForm.pNewPassword.$error.required && patientPasswordForm.pNewPassword.$dirty" class="alert alert-danger"><strong>Password</strong>
+                        is required</span>
+                </span>
+                        </div>
+
+                        <div>
+                            <span style="color: red">{{serverPasswordError}}</span>
+                        </div>
+
+                        <div class="doit">
+                            <input class="btn btn-success but1 col-mn1" type="submit" id="submit_button" value="Update Password"
+                                   ng-click="passwordUpdate()"
+                                   ng-disabled="patientPasswordForm.$invalid">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+
+            <div class="row" ng-show="patientReports_Show">
+
+
+
+            </div>
+
+
             <!-- /row -->
         </div>
         <!-- /container -->

@@ -142,8 +142,7 @@ function patientSignUp(msg, callback){
         }
         else
         {
-            var insertPatient= "INSERT INTO `patient_info`(`first_name`, `last_name`, `email`, `password`, `phone_number`, `address`,`cCCNo`, `cCVV`, `cExpDate`) VALUES ("+"'"+msg.pFirstName+"', '"+msg.pLastName+"', '"+msg.pEmail+"','"+msg.pPassword+"','"+msg.pPhoneNumber+"','"+msg.pAddress+"','"+msg.pCreditCardNumber+"','"+msg.pCreditCardSC+"','"+msg.pExpDate+"')";
-            console.log(insertPatient)
+            var insertPatient= "INSERT INTO `patient_info`(`first_name`, `last_name`, `email`, `password`, `phone_number`, `address`, `city`, `state`, `zip`, `cCCNo`, `cCVV`, `cExpDate`) VALUES ("+"'"+msg.pFirstName+"', '"+msg.pLastName+"', '"+msg.pEmail+"','"+msg.pPassword+"','"+msg.pPhoneNumber+"','"+msg.pAddress+"','"+msg.pCity+"','"+msg.pState+"','"+msg.pZip+"','"+msg.pCreditCardNumber+"','"+msg.pCreditCardSC+"','"+msg.pExpDate+"')";
             mysql.insertData(function (err, results)
             {
                 if (results.affectedRows > 0)
@@ -174,7 +173,6 @@ function handle_request(msg, callback){
             callback(null,result);
         });
     } else if(msg.methodName == "patientSignUp"){
-        console.log("Req in customer backend");
         patientSignUp(msg,function(result){
             callback(null,result);
         });

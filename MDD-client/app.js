@@ -76,7 +76,7 @@ app.use(session({
 
 // Session
 app.get('/session', index.session);
-app.get('/sessionEnd', index.sessionEnd);
+app.get('/logout', index.logout);
 
 
 // Users
@@ -104,7 +104,7 @@ app.post('/userSignInAdmin', function(req, res, next) {
                 return next(err);
             }
             req.session.userName = user.results[0].email;
-            req.session.pid = user.results[0].patient_id;
+            req.session.pID = user.results[0].patient_id;
             console.log("session initilized")
             return res.send({"statusCode":"200","signInAs":"admin","msg":"valid patient logging in"});
         })
@@ -176,7 +176,7 @@ app.post('/userSignInDoctor', function(req, res, next) {
                 doctorLogs.insertDLog("userID: " + req.session.dId + " logged in");
             }, 0);
             console.log("session initilized")
-            return res.send({"statusCode":"200","signInAs":"doctor","msg":"valid doctor logging in"});
+            return res.send({"statusCode":"200","signInAs":"doctor","doctorID":req.session.dId,"msg":"valid doctor logging in"});
         })
     })(req, res, next)
 });
@@ -202,17 +202,23 @@ app.post('/userSignInPatient', function(req, res, next) {
                 return next(err);
             }
             req.session.userName = user.results[0].email;
-            req.session.pid = user.results[0].patient_id;
+            req.session.pID = user.results[0].patient_id;
             setTimeout(function () {
-                patientLogs.insertPLog("userID: " + req.session.pid + " logged in");
+                patientLogs.insertPLog("userID: " + req.session.pID + " logged in");
             }, 0);
             console.log("session initilized")
-            return res.send({"statusCode":"200","signInAs":"patient","msg":"valid patient logging in"});
+            return res.send({"statusCode":"200","signInAs":"patient","patientID":req.session.pID, "msg":"valid patient logging in"});
         })
     })(req, res, next)
 });
 app.get('/patientHome', patient.patientHome);
+app.get('/patientDetails', patient.patientDetails);
+app.post('/updatePatientDetails', patient.updatePatientDetails);
+app.post('/patientUpdatePassword', patient.patientUpdatePassword);
 
+app.get('/patientReports', patient.patientReports);
+app.get('/reports', patient.reports);
+app.post('/reportUpload', patient.reportUpload);
 
 
 // catch 404 and forward to error handler
@@ -234,5 +240,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
 
 module.exports = app;
