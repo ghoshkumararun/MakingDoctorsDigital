@@ -23,7 +23,7 @@ var app = express();
 var doctorLogs = require('./routes/doctorLogs');
 var patientLogs = require('./routes/patientLogs');
 
-//Logger
+//Logger for application
 doctorLogs.initializeDLogger();
 patientLogs.initializePLogger();
 
